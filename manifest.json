@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "HTMW Better Theming",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Clearer P/L color-coding and dark mode for howthemarketworks.com",
   "homepage_url": "https://github.com/Zexolver/HTMW-BT",
   "permissions": ["storage"],

@@ -104,6 +104,14 @@
       touched = true;
     }
 
+    // Gradient backgrounds (hero banners, buttons, etc.) aren't caught by
+    // the background-color check above and otherwise stay light.
+    if (/gradient/i.test(style.backgroundImage)) {
+      saved.backgroundImage = el.style.getPropertyValue("background-image");
+      el.style.setProperty("background-image", "none", "important");
+      touched = true;
+    }
+
     if (touched) darkenedElements.set(el, saved);
   }
 
@@ -117,6 +125,10 @@
     if ("color" in saved) {
       if (saved.color) el.style.setProperty("color", saved.color);
       else el.style.removeProperty("color");
+    }
+    if ("backgroundImage" in saved) {
+      if (saved.backgroundImage) el.style.setProperty("background-image", saved.backgroundImage);
+      else el.style.removeProperty("background-image");
     }
     darkenedElements.delete(el);
   }
@@ -236,7 +248,10 @@
   }
 
   function styleBox(box, kind, percent) {
-    const intensity = Math.min(1, MIN_INTENSITY + (percent / PERCENT_CAP) * (1 - MIN_INTENSITY));
+    const intensity =
+      percent === null
+        ? MIN_INTENSITY
+        : Math.min(1, MIN_INTENSITY + (percent / PERCENT_CAP) * (1 - MIN_INTENSITY));
     box.style.setProperty("--htmw-bt-color", kind === "gain" ? GREEN : RED);
     box.style.setProperty("--htmw-bt-intensity", intensity.toFixed(2));
     box.classList.add("htmw-bt-box");
@@ -249,7 +264,6 @@
     for (const { el, kind } of candidates) {
       const box = findBoxAncestor(el);
       const percent = findMagnitudePercent(box);
-      if (percent === null) continue; // no confirmed gain/loss figure nearby
       styleBox(box, kind, percent);
       el.classList.add("htmw-bt-hide-indicator");
     }
