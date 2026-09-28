@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "HTMW Better Trading",
+  "version": "0.1.0",
+  "description": "Clearer P/L color-coding and dark mode for howthemarketworks.com",
+  "homepage_url": "https://github.com/Zexolver/HTMW-BT",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["*://*.howthemarketworks.com/*"],
+      "js": ["src/content.js"],
+      "css": ["src/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "htmw-bt@zexolver",
+      "strict_min_version": "109.0"
+    }
+  }
+}
