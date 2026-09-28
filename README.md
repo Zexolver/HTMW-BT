@@ -1,4 +1,4 @@
-# HTMW Better Trading
+# HTMW-BT (Better Theming)
 
 A lightweight browser extension (Chromium + Firefox) that improves the
 readability of [howthemarketworks.com](https://www.howthemarketworks.com/).
@@ -37,16 +37,38 @@ src/content.css       Styles for the re-colored boxes / dark mode
 src/popup.html/.js/.css   Toolbar popup (settings: dark mode toggle)
 ```
 
+## Install
+
+Grab the zip from the [latest release](https://github.com/Zexolver/HTMW-BT/releases/latest),
+unzip it, then:
+
+- **Chrome / Edge / Brave (Chromium-based):**
+  1. Go to `chrome://extensions`.
+  2. Turn on **Developer mode** (top right).
+  3. Click **Load unpacked** and select the unzipped folder.
+- **Firefox:**
+  - *Temporary (until browser restart), any Firefox:*
+    `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** →
+    select `manifest.json` inside the unzipped folder.
+  - *Permanent:* Firefox only runs permanently-installed extensions that
+    are signed by Mozilla, or unsigned ones if you're on Firefox
+    Developer Edition/Nightly/ESR with `xpinstall.signatures.required`
+    set to `false` in `about:config`. Otherwise, re-run "Load Temporary
+    Add-on" after each restart.
+
 ## Development
 
-Load as an unpacked extension:
+Load the `src/` + `manifest.json` straight from this repo as an unpacked
+extension (same steps as above, pointed at the repo folder instead of a
+release zip).
 
-- **Chrome/Chromium:** `chrome://extensions` → Developer mode → Load
-  unpacked → select this folder.
-- **Firefox:** `about:debugging#/runtime/this-firefox` → Load Temporary
-  Add-on → select `manifest.json`.
+To produce a release zip yourself: `./scripts/build.sh` → writes
+`dist/htmw-bt-<version>.zip`.
 
 ## Status
 
-Early scaffolding — color-coding and dark mode logic are not yet
-implemented.
+Dark mode is a working generic invert-filter theme. Gain/loss
+color-coding uses heuristic detection (color + shape + nearby "%" text)
+rather than hardcoded site selectors, since the portfolio pages are
+behind login and haven't been inspected directly yet — it should be
+treated as a first pass pending verification against the live site.
