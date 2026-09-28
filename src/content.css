@@ -10,23 +10,33 @@
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
+.htmw-bt-arrow {
+  display: inline-block;
+  margin-right: 0.25em;
+  font-size: 0.85em;
+  color: rgb(var(--htmw-bt-color));
+}
+
 .htmw-bt-hide-indicator {
   display: none !important;
 }
 
 /* --- Dark mode ---
-   Generic invert-based dark theme: flip the whole page, then flip
-   images/video/canvas back so photos and charts stay true-color. */
+   Firefox-dark-theme-style gray repaint, applied per-element in
+   content.js (light backgrounds -> dark gray, dark text -> light).
+   These rules just handle the page base and non-HTML-styled content
+   (canvas/svg charts) that the per-element pass can't reach. */
 html.htmw-bt-dark {
-  filter: invert(1) hue-rotate(180deg);
-  background: #fff;
+  color-scheme: dark;
+  background: #1c1b22;
 }
 
-html.htmw-bt-dark img,
-html.htmw-bt-dark video,
+html.htmw-bt-dark body {
+  background: #2b2a33;
+  color: #fbfbfe;
+}
+
 html.htmw-bt-dark canvas,
-html.htmw-bt-dark svg,
-html.htmw-bt-dark picture,
-html.htmw-bt-dark .htmw-bt-box {
-  filter: invert(1) hue-rotate(180deg);
+html.htmw-bt-dark svg {
+  filter: invert(0.88) hue-rotate(180deg);
 }

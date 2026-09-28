@@ -67,8 +67,16 @@ To produce a release zip yourself: `./scripts/build.sh` → writes
 
 ## Status
 
-Dark mode is a working generic invert-filter theme. Gain/loss
-color-coding uses heuristic detection (color + shape + nearby "%" text)
-rather than hardcoded site selectors, since the portfolio pages are
-behind login and haven't been inspected directly yet — it should be
-treated as a first pass pending verification against the live site.
+Both features use heuristic detection (color, shape, and nearby "%"
+text) rather than hardcoded site selectors, since the portfolio pages
+are behind login and haven't been inspected directly. Treat this as an
+iterating-against-real-feedback build rather than a finished product.
+
+- **Dark mode:** per-element repaint (light backgrounds -> dark gray,
+  dark text -> light gray), not a blanket color invert — closer to
+  Firefox's built-in dark theme. Charts/graphs (`<canvas>`/`<svg>`) get
+  a separate invert so they don't stay light against the dark page.
+- **Color-coding:** only boxes elements with a small round/icon shape,
+  a red/green tint, and a nearby explicitly-signed percentage (e.g.
+  "+2.3%") — this excludes sidebar widgets (announcements, pie charts,
+  etc.) that have colors but no signed gain/loss figure.
