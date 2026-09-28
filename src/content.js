@@ -33,20 +33,21 @@
   // happens to live inside them.
   const EXCLUDE_ANCESTOR_PATTERN =
     /chart|legend|graph|widget|sidebar|announce|assignment|summary|donut|pie|calendar|feed|news|word[-_]?of[-_]?the[-_]?day|wotd/i;
-  // Pages where color-coding isn't about a cost-basis gain/loss (e.g.
-  // rankings), so heuristic matching there does more harm than good.
-  const EXCLUDED_PATH_PATTERN = /\/accounting\/rankings/i;
 
   // --- Dark mode tuning (Firefox dark-theme-ish palette) ---
   // Two background tiers give page chrome some depth (cards vs. their
   // surroundings); the page base itself (html/body, in content.css) is
   // a single flat color regardless of this tiering.
   const DARK_BG_MID = "#2b2a33";
-  const DARK_BG_LIGHT = "#38373d";
+  const DARK_BG_LIGHT = "#403f47";
   const LIGHT_TEXT = "#fbfbfe";
   const LIGHT_BG_THRESHOLD = 200; // near-white -> DARK_BG_MID
   const MID_BG_THRESHOLD = 120; // light gray -> DARK_BG_LIGHT
   const DARK_TEXT_THRESHOLD = 120; // dark text -> LIGHT_TEXT
+  // Skip recoloring backgrounds with real color in them (buttons, brand
+  // accents, badges) — only flatten neutral/near-white/gray chrome so
+  // the site doesn't lose its accent colors under dark mode.
+  const SATURATION_GUARD = 30;
 
   let settings = { ...DEFAULTS };
   let observer = null;
@@ -71,6 +72,10 @@
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   }
 
+  function saturation([r, g, b]) {
+    return Math.max(r, g, b) - Math.min(r, g, b);
+  }
+
   // ---------------- Dark mode ----------------
 
   function darkenElement(el) {
@@ -80,7 +85,7 @@
     const saved = {};
     let touched = false;
 
-    if (bg) {
+    if (bg && saturation(bg) < SATURATION_GUARD) {
       const l = luminance(bg);
       if (l > LIGHT_BG_THRESHOLD) {
         saved.backgroundColor = el.style.getPropertyValue("background-color");
@@ -239,7 +244,7 @@
   }
 
   function runColorCoding(root) {
-    if (!settings.colorCoding || EXCLUDED_PATH_PATTERN.test(location.pathname)) return;
+    if (!settings.colorCoding) return;
     const candidates = findIndicatorCandidates(root);
     for (const { el, kind } of candidates) {
       const box = findBoxAncestor(el);
