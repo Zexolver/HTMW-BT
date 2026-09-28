@@ -38,11 +38,14 @@
   const EXCLUDED_PATH_PATTERN = /\/accounting\/rankings/i;
 
   // --- Dark mode tuning (Firefox dark-theme-ish palette) ---
-  // A single flat background color for every repainted element, so the
-  // page reads as one solid surface instead of a patchwork of shades.
-  const DARK_BG = "#2b2a33";
+  // Two background tiers give page chrome some depth (cards vs. their
+  // surroundings); the page base itself (html/body, in content.css) is
+  // a single flat color regardless of this tiering.
+  const DARK_BG_MID = "#2b2a33";
+  const DARK_BG_LIGHT = "#38373d";
   const LIGHT_TEXT = "#fbfbfe";
-  const LIGHT_BG_THRESHOLD = 180; // backgrounds lighter than this get darkened
+  const LIGHT_BG_THRESHOLD = 200; // near-white -> DARK_BG_MID
+  const MID_BG_THRESHOLD = 120; // light gray -> DARK_BG_LIGHT
   const DARK_TEXT_THRESHOLD = 120; // dark text -> LIGHT_TEXT
 
   let settings = { ...DEFAULTS };
@@ -77,10 +80,17 @@
     const saved = {};
     let touched = false;
 
-    if (bg && luminance(bg) > LIGHT_BG_THRESHOLD) {
-      saved.backgroundColor = el.style.getPropertyValue("background-color");
-      el.style.setProperty("background-color", DARK_BG, "important");
-      touched = true;
+    if (bg) {
+      const l = luminance(bg);
+      if (l > LIGHT_BG_THRESHOLD) {
+        saved.backgroundColor = el.style.getPropertyValue("background-color");
+        el.style.setProperty("background-color", DARK_BG_MID, "important");
+        touched = true;
+      } else if (l > MID_BG_THRESHOLD) {
+        saved.backgroundColor = el.style.getPropertyValue("background-color");
+        el.style.setProperty("background-color", DARK_BG_LIGHT, "important");
+        touched = true;
+      }
     }
 
     if (fg && luminance(fg) < DARK_TEXT_THRESHOLD) {
