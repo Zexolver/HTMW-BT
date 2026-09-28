@@ -12,7 +12,7 @@
 
 .htmw-bt-arrow {
   display: inline-block;
-  margin-right: 0.25em;
+  margin-left: 0.25em;
   font-size: 0.85em;
   color: rgb(var(--htmw-bt-color));
 }
@@ -26,12 +26,9 @@
    content.js (light backgrounds -> dark gray, dark text -> light).
    These rules just handle the page base and non-HTML-styled content
    (canvas/svg charts) that the per-element pass can't reach. */
-html.htmw-bt-dark {
-  color-scheme: dark;
-  background: #1c1b22;
-}
-
+html.htmw-bt-dark,
 html.htmw-bt-dark body {
+  color-scheme: dark;
   background: #2b2a33;
   color: #fbfbfe;
 }

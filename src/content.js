@@ -33,14 +33,16 @@
   // happens to live inside them.
   const EXCLUDE_ANCESTOR_PATTERN =
     /chart|legend|graph|widget|sidebar|announce|assignment|summary|donut|pie|calendar|feed|news|word[-_]?of[-_]?the[-_]?day|wotd/i;
+  // Pages where color-coding isn't about a cost-basis gain/loss (e.g.
+  // rankings), so heuristic matching there does more harm than good.
+  const EXCLUDED_PATH_PATTERN = /\/accounting\/rankings/i;
 
   // --- Dark mode tuning (Firefox dark-theme-ish palette) ---
-  const DARK_BG_BASE = "#1c1b22";
-  const DARK_BG_MID = "#2b2a33";
-  const DARK_BG_LIGHT = "#38373d";
+  // A single flat background color for every repainted element, so the
+  // page reads as one solid surface instead of a patchwork of shades.
+  const DARK_BG = "#2b2a33";
   const LIGHT_TEXT = "#fbfbfe";
-  const LIGHT_BG_THRESHOLD = 200; // near-white -> DARK_BG_MID
-  const MID_BG_THRESHOLD = 120; // light gray -> DARK_BG_LIGHT
+  const LIGHT_BG_THRESHOLD = 180; // backgrounds lighter than this get darkened
   const DARK_TEXT_THRESHOLD = 120; // dark text -> LIGHT_TEXT
 
   let settings = { ...DEFAULTS };
@@ -75,17 +77,10 @@
     const saved = {};
     let touched = false;
 
-    if (bg) {
-      const l = luminance(bg);
-      if (l > LIGHT_BG_THRESHOLD) {
-        saved.backgroundColor = el.style.getPropertyValue("background-color");
-        el.style.setProperty("background-color", DARK_BG_MID, "important");
-        touched = true;
-      } else if (l > MID_BG_THRESHOLD) {
-        saved.backgroundColor = el.style.getPropertyValue("background-color");
-        el.style.setProperty("background-color", DARK_BG_LIGHT, "important");
-        touched = true;
-      }
+    if (bg && luminance(bg) > LIGHT_BG_THRESHOLD) {
+      saved.backgroundColor = el.style.getPropertyValue("background-color");
+      el.style.setProperty("background-color", DARK_BG, "important");
+      touched = true;
     }
 
     if (fg && luminance(fg) < DARK_TEXT_THRESHOLD) {
@@ -195,11 +190,9 @@
     return candidates;
   }
 
-  // Requires an explicit +/- sign so plain informational percentages
-  // (e.g. a portfolio-allocation pie chart's "34%" label) don't match.
   function findMagnitudePercent(box) {
-    const match = box.textContent.match(/([+-])\s*(\d+(?:\.\d+)?)\s*%/);
-    return match ? parseFloat(match[2]) : null;
+    const match = box.textContent.match(/([+-]?\d+(?:\.\d+)?)\s*%/);
+    return match ? Math.abs(parseFloat(match[1])) : null;
   }
 
   function findBoxAncestor(el) {
@@ -224,7 +217,7 @@
     arrow.className = "htmw-bt-arrow";
     arrow.textContent = kind === "gain" ? "▲" : "▼";
     arrow.setAttribute("aria-hidden", "true");
-    box.prepend(arrow);
+    box.append(arrow);
   }
 
   function styleBox(box, kind, percent) {
@@ -236,7 +229,7 @@
   }
 
   function runColorCoding(root) {
-    if (!settings.colorCoding) return;
+    if (!settings.colorCoding || EXCLUDED_PATH_PATTERN.test(location.pathname)) return;
     const candidates = findIndicatorCandidates(root);
     for (const { el, kind } of candidates) {
       const box = findBoxAncestor(el);
